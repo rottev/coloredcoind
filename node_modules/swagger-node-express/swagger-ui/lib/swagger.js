@@ -859,7 +859,9 @@
             url = url.replace(reg, encodeURIComponent(args[param.name]));
             delete args[param.name];
           } else {
-            throw "" + param.name + " is a required path param.";
+            var reg = new RegExp('\{' + param.name + '[^\}]*\}', 'gi');
+            url = url.replace(reg, "");
+            delete args[param.name];
           }
         }
       }

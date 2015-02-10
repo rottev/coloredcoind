@@ -4,6 +4,7 @@ module.exports = (function () {
     var sw = require("swagger-node-express");
     var utils = require('../../utils.js');
     var config = require('../../config.js');
+    var redis = require('redis');
     var Q = require("q");
 
 
@@ -13,7 +14,31 @@ module.exports = (function () {
 
     color.registerRoutes = function registerRoutes(app, path, swagger) {
      
+         //endpoint to issue an asset
+        var getAddress = {
+            'spec': {
+                "description": "",
+                "path": "/coloraddress",
+                "notes": "Returns a colored adress for the normal address given",
+                "summary": "",
+                "method": "POST",
+                "parameters": [
+                        sw.bodyParam("AddressIn", "Asset Issue Object", "AddressIn")
+                ],
+                "type": "string",
+                "errorResponses": [swagger.errors.notFound('address')],
+                "nickname": "getAddress"
+            },
+            'action': function (req, res) {
+                console.log("get address action");
+                tryGetAddress(req, res);
+            }
+        };
 
+        swagger.addPost(getAddress);
+
+
+        //endpoint to issue an asset
         var issueAsset = {
             'spec': {
                 "description": "",
@@ -23,8 +48,6 @@ module.exports = (function () {
                 "method": "POST",
                 "parameters": [
                         sw.bodyParam("AssetDefinition", "Asset Issue Object", "AssetDefinition")
-                //swagger.pathParam("AssetIssue", "Asset Issue Object", "string")     
-                /* swagger.pathParam("petId", "ID of pet that needs to be fetched", "string") */
                 ],
                 "type": "CreatedAsset",
                 "errorResponses": [swagger.errors.notFound('asset')],
@@ -38,6 +61,30 @@ module.exports = (function () {
 
         swagger.addPost(issueAsset);
 
+        //endpoint to send an asset
+         var sendAsset = {
+            'spec': {
+                "description": "",
+                "path": "/sendasset",
+                "notes": "Returns a issued asset",
+                "summary": "",
+                "method": "POST",
+                "parameters": [
+                        sw.bodyParam("SendAsset", "Asset Send Object", "SendAsset")
+                ],
+                "type": "SendAssetResponse",
+                "errorResponses": [swagger.errors.notFound('asset')],
+                "nickname": "sendAsset"
+            },
+            'action': function (req, res) {
+                console.log("send asset action");
+                trySendAsset(req, res);
+            }
+        };
+
+        swagger.addPost(sendAsset);
+
+        //endpoint to get asset metadata
         var getAsset = {
             'spec': {
                 "description": "",
@@ -51,33 +98,30 @@ module.exports = (function () {
                 "nickname": "getAsset"
             },
             'action': function (req, res) {
-                // res.send(JSON.stringify({ ok: "ok" }));
                 res.send(api.getAssetDefeintion(req.params.assetId));
             }
         };
 
         swagger.addGet(getAsset);
 
-
+        // endpoint to get all adresses holding an asset
          var getHoldingAdressesForAsset = {
             'spec': {
                 "description": "",
-                "path": "/stakeholders/{assetId}/:{blockheight}?",
+                "path": "/stakeholders/{assetId}/{blockheight}?",
                 "notes": "Returns a all adresses holding the asset",
                 "summary": "",
                 "method": "GET",
                 "parameters": [
                         sw.pathParam("assetId", "ID of Asset we want to get info for", "string"),
-                        sw.pathParam("blockheight", "block hieght to consider (optional)", "int")
-                //swagger.pathParam("AssetIssue", "Asset Issue Object", "string")     
-                /* swagger.pathParam("petId", "ID of pet that needs to be fetched", "string") */
+                        sw.pathParam("blockheight", "block hieght to consider (optional)", "integer", false)
                 ],
-                "type": "AssetHolder",
+                "type": "AssetHolders",
                 "errorResponses": [swagger.errors.notFound('asset')],
                 "nickname": "getStakeholders"
             },
             'action': function (req, res) {
-                console.log("issue action");
+                console.log("get stakeholders action");
                 trygetAssetStakeholders(req, res);
             }
         };
@@ -90,6 +134,19 @@ module.exports = (function () {
 
     }
 
+    function  tryGetAddress(req, res){
+        try{
+            var adder = utils.getAssetAddressId(req.body.address);
+            client = redis.createClient();
+            client.hmset("addresses", req.body.address, req.body.email, function(err, data){
+                console.log(data);
+            });
+             res.json({adress: adder});
+        }
+        catch(e) {
+             res.status(500).send({ error: e.message });
+        }
+    }
 
     function tryIssueAsset(req, res) {
         console.log("issueAsset")
@@ -118,12 +175,35 @@ module.exports = (function () {
 
     }
 
-    function trygetAssetStakeholders(req, res) {
+
+
+    function trySendAsset(req, res) {
         try{
-            
+            api.sendAsset(req.body)
+             .then(function(data){
+                 res.json({ txHex: data.raw});
+            })
+            .catch(function(error){
+                 res.status(500).send({ error: error.message });
+            });  
         }
         catch(e) {
-            
+             res.status(500).send({ error: e.message });
+        }
+    }
+
+    function trygetAssetStakeholders(req, res) {
+        try{
+            api.getAssetStakeholders(req.params.assetId, req.params.blockheight)
+            .then(function(data){
+                 res.json(data);
+            })
+            .catch(function(error){
+                 res.status(500).send({ error: error.message });
+            });  
+        }
+        catch(e) {
+             res.status(500).send({ error: e.message });
         }
     }
 

@@ -12,6 +12,9 @@ module.exports = (function () {
         client.registerMethod("broadcastTransaction", config.apiurl + "sendrawtransaction", "POST");
         client.registerMethod("getTransaction", config.apiurl + "transactions/${transaction_hash}", "GET");
         client.registerMethod("getRawTxInfo", config.apiurl + "analyzerawtransactions", "POST");
+        client.registerMethod("getStakerholders", config.apiurl + "assets/${asset_id}/owners?block=${block_height}", "GET");
+        client.registerMethod("getStakerholdersNoBlockhieght", config.apiurl + "assets/${asset_id}/owners", "GET");
+        client.registerMethod("sendAsset", config.apiurl + "sendasset?format=raw", "POST");
     }
 
     colorapi.getAssetDefeintion = function getAssetDefeintion(asset_address) {
@@ -25,6 +28,31 @@ module.exports = (function () {
             if (response.statusCode == 200) {
                 console.log("getAssetDefeintion:(200) " + data);
                 deferred.resolve(data);
+            }
+            else {
+                deferred.reject(new Error("Status code was " + response.statusCode));
+            }
+        }).on('error', function (err) {
+            console.log('something went wrong on the request', err.request.options);
+            deferred.reject(new Error("Status code was " + err.request.options));
+        });
+
+        return deferred.promise;
+    }
+
+
+     colorapi.sendAsset = function sendAsset(sendData) {
+        var deferred = Q.defer();
+        var args = {
+            data: sendData,
+            headers: { "Content-Type": "application/json" }
+
+        };
+        client.methods.sendAsset(args, function (data, response) {
+            console.log(data);
+            if (response.statusCode == 200) {
+                console.log("getAssetDefeintion:(200) " + data);
+                deferred.resolve(JSON.parse(data));
             }
             else {
                 deferred.reject(new Error("Status code was " + response.statusCode));
@@ -137,6 +165,48 @@ module.exports = (function () {
 
         return deferred.promise;
     }
+
+
+    colorapi.getAssetStakeholders = function getAssetStakeholders(asset_id, block_height) {
+        var deferred = Q.defer();
+        var args = {
+            path: { "asset_id": asset_id },
+            headers: { "Content-Type": "application/json" }
+        };
+        if (block_height) {
+            args.parameters = { "block_height": block_height };
+            client.methods.getStakerholders(args, function (data, response) {
+                console.log(data);
+                if (response.statusCode == 200) {
+                    deferred.resolve(data);
+                }
+                else {
+                    deferred.reject(new Error("Status code was " + response.statusCode));
+                }
+            }).on('error', function (err) {
+                console.log('something went wrong on the request', err.request.options);
+                deferred.reject(new Error("Status code was " + err.request.options));
+            });
+        }
+        else{
+             client.methods.getStakerholdersNoBlockhieght(args, function (data, response) {
+                console.log(data);
+                if (response.statusCode == 200) {
+                    deferred.resolve(data);
+                }
+                else {
+                    deferred.reject(new Error("Status code was " + response.statusCode));
+                }
+            }).on('error', function (err) {
+                console.log('something went wrong on the request', err.request.options);
+                deferred.reject(new Error("Status code was " + err.request.options));
+            });
+        }
+       
+
+        return deferred.promise;
+    }
+
 
     colorapi();
 
