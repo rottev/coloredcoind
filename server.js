@@ -57,14 +57,12 @@ controllers.register(app);
 var docs_handler = express.static(__dirname + '/node_modules/swagger-node-express/swagger-ui');
 app.get(/^\/docs(\/.*)?$/, function (req, res, next) {
     if (req.url === '/docs') { // express static barfs on root url w/o trailing slash
-        res.writeHead(302, { 'Location': req.url + '/' });
-        res.end();
-        console.log("barf");
+        res.redirect('/docs/');
         return;
     }
     // take off leading /docs so that connect locates file correctly
     req.url = req.url.substr('/docs'.length);
-     console.log("barf 2");
+    console.log("barf 2");
     return docs_handler(req, res, next);
 });
 
@@ -77,6 +75,6 @@ var options = {
 
 
 app.use('/metadata', express.static(__dirname + '/static/metadata', options));
-
+app.use('/doc',express.static(__dirname + '/doc'))
 
 app.listen(8080);

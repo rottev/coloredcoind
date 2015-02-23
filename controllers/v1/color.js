@@ -134,6 +134,16 @@ module.exports = (function () {
 
     }
 
+    /**
+     * @api {get} /asset/:id Request User information
+     * @apiName GetAssetMetadata
+     * @apiGroup Color
+     *
+     * @apiParam {Number} id Asset unique ID.
+     *
+     * @apiSuccess {Object} AssetMetadata asset metadata.
+     * 
+     */
     function  tryGetAddress(req, res){
         try{
             var adder = utils.getAssetAddressId(req.body.address);
