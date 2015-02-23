@@ -77,4 +77,4 @@ var options = {
 app.use('/metadata', express.static(__dirname + '/static/metadata', options));
 app.use('/doc',express.static(__dirname + '/doc'))
 
-app.listen(8080);
+app.listen(process.env.PORT || 8080);
