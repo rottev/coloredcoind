@@ -1,7 +1,7 @@
 exports.models = {
     "AssetDefinition": {
         "id": "AssetDefinition",
-        "required": ["issue_adress", "name", "sort_name", "amount","fee","selfhost", "metadata"],
+        "required": ["issue_adress", "name", "short_name", "amount","fee","selfhost", "metadata"],
         "properties": {
              "issue_adress": {
                 "type": "string",
@@ -11,9 +11,9 @@ exports.models = {
                 "type": "string",
                 "description": "Name of the asset"
             },
-             "sort_name": {
+             "short_name": {
                 "type": "string",
-                "description": "Sort name of the asset"
+                "description": "Short name of the asset"
             },
             "amount": {
                 "type": "string",
