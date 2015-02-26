@@ -5,7 +5,13 @@
      *
      * @apiParam {Number} id Asset unique ID.
      *
-     * @apiSuccess {Object} AssetMetadata asset metadata.
+     * @apiSuccess {String} issuer Name of the asset issuer
+ 	 * @apiSuccess {Number} divisibility How divisible is the asset
+ 	 * @apiSuccess {String} icon_url The URL to an icon representing the asset, image file should be 48x48 pixels
+ 	 * @apiSuccess {String} image_url the URL to an image representing the asset, image file should be 260 pixels wide at least
+ 	 * @apiSuccess {String} version Version of protocol as string (currently 1.0)
+ 	 * @apiSuccess {String} type String for the type of the token
+ 	 * @apiSuccess {String} description String that describes the asset 	  
      * @apiVersion 1.0.0
      * 
      */
@@ -42,14 +48,14 @@
      * @apiParam {Boolean} selfhost Flag to indicate if you are hosting the metadta file or server will (recommended that you host it)
      * @apiParam {String} [metadat_url] url where you host the metadata file (if you host it)
      * @apiParam {Boolean} [sorten_url] use goo.gl to shorten your url and encode it
-     * @apiParam {Object} AssetMetadata
-     * @apiParam (AssetMetadata) {String} issuer Name of the asset issuer
- 	 * @apiParam (AssetMetadata) {Number} divisibility How divisible is the asset
- 	 * @apiParam (AssetMetadata) {String} icon_url The URL to an icon representing the asset, image file should be 48x48 pixels
- 	 * @apiParam (AssetMetadata) {String} image_url the URL to an image representing the asset, image file should be 260 pixels wide at least
- 	 * @apiParam (AssetMetadata) {String} version Version of protocol as string (currently 1.0)
- 	 * @apiParam (AssetMetadata) {String} type String for the type of the token
- 	 * @apiParam (AssetMetadata) {String} description String that describes the asset 	  	 
+     * @apiParam {Object} metadata
+     * @apiParam {String} metadata.issuer Name of the asset issuer
+ 	 * @apiParam {Number} metadata.divisibility How divisible is the asset
+ 	 * @apiParam {String} metadata.icon_url The URL to an icon representing the asset, image file should be 48x48 pixels
+ 	 * @apiParam {String} metadata.image_url the URL to an image representing the asset, image file should be 260 pixels wide at least
+ 	 * @apiParam {String} metadata.version Version of protocol as string (currently 1.0)
+ 	 * @apiParam {String} metadata.type String for the type of the token
+ 	 * @apiParam {String} metadata.description String that describes the asset 	  	 
      *
      * @apiSuccess {Object} CreatedAsset asset metadata.
      * @apiVersion 1.0.0
@@ -65,10 +71,10 @@
      *
      * @apiParam {Number} fees Fees for transaction in satoshi.
      * @apiParam {String} Colored adress to send the asset from. 
-	 * @apiParam {Object[]} SendAssetToAdress Array of SendAssetToAdress items.
-     * @apiParam (SendAssetToAdress) {String} address Address that will recive the asset
- 	 * @apiParam (SendAssetToAdress) {String} amount Units of the asset to send
- 	 * @apiParam (SendAssetToAdress) {String} asset_id Id of the asset	  	 
+	 * @apiParam {Object[]} to Array of SendAssetToAdress items.
+     * @apiParam {String} to.address Address that will recive the asset
+ 	 * @apiParam {String} to.amount Units of the asset to send
+ 	 * @apiParam {String} to.asset_id Id of the asset	  	 
      *
      * @apiSuccess {Object} AssetMetadata asset metadata.
      * @apiVersion 1.0.0
@@ -85,13 +91,13 @@
      * @apiParam {String} assetId Asset unique ID.
      * @apiParam {Number} blockheight Block hieght to consider.     
      *
-     * @apiSuccess {Object[]} AssetHolders asset metadata.
-     * @apiSuccess (AssetHolders) {Number} block_height block height at which to start search.
-     * @apiSuccess (AssetHolders) {String} asset_id asset metadata.
-     * @apiSuccess (AssetHolders) {Object[]} owners asset metadata.
-     * @apiSuccess (AssetHolders.owners) {String} Script for the asset.
-     * @apiSuccess (AssetHolders.owners) {String} Adress holding the asset.
-     * @apiSuccess (AssetHoldersowners) {String} asset_quantity quantity of the asset.
+     * @apiSuccess {Object[]} asset asset metadata.
+     * @apiSuccess {Number} asset.block_height block height at which to start search.
+     * @apiSuccess {String} asset.asset_id asset metadata.
+     * @apiSuccess {Object[]} asset.owners asset metadata.
+     * @apiSuccess {String} asset.owners.script Script for the asset.
+     * @apiSuccess {String} asset.owners.address Adress holding the asset.
+     * @apiSuccess {String} asset.owners.asset_quantity quantity of the asset.
      * @apiVersion 1.0.0
      * 
      */
