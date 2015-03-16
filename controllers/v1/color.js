@@ -6,6 +6,7 @@ module.exports = (function () {
     var config = require('../../config.js');
     var redis = require('redis');
     var Q = require("q");
+    var AWS = require("aws-sdk");
 
 
     function color() { };
@@ -284,15 +285,37 @@ module.exports = (function () {
         */
     }
 
-    function hostMetadataFile(AssetDefinition, hostOnS3) {
+    function hostMetadataFile(AssetDefinition) {
+        console.log("hostMetadataFile");
+       var deferred = Q.defer();
+        if(config.useS3 && process.env.AWSAKI && process.env.AWSSSK) {
+              console.log("s3");
+                 AWS.config.update({ accessKeyId: process.env.AWSAKI,
+                        secretAccessKey: process.env.AWSSSK
+                    });
 
-        if(hostOnS3) {
+                var s3bucket = new AWS.S3({params: {Bucket: 'coloredcoin-assets'}});
+                var longurl = generateLocalMetadataPath(AssetDefinition);
+                google.getShortUrl(longurl)
+                .then(function (url) {
+                    AssetDefinition.contract_url = url;
+                    s3bucket.upload({Key: AssetDefinition.short_name, Body:JSON.stringify(AssetDefinition), ContentType: 'application/json' }, function(err, data) {
+                        if (err) {
+                          console.log("Error uploading data: ", err);
+                            deferred.reject(new Error("Status code was " + err));
+                        } else {
+                          console.log("Successfully uploaded data to myBucket/myKey");
+                           deferred.resolve(url);
+                        }
+                    });
+                }, function (error) {
+                    deferred.reject(new Error("Status code was " + response.statusCode));
+                });
 
+                
         }
         else
         {
-            var deferred = Q.defer();
-
             var longurl = generateLocalMetadataPath(AssetDefinition);
             google.getShortUrl(longurl)
             .then(function (url) {
@@ -303,18 +326,22 @@ module.exports = (function () {
             function (error) {
                 deferred.reject(new Error("Status code was " + response.statusCode));
             });
-
-            AssetDefinition.contract_url;
-
-            return deferred.promise;
+            
         }
-
+        return deferred.promise;
       
     }
 
     function generateLocalMetadataPath(AssetDefinition) {
-        var path = config.machineurl + "/metadata/" + AssetDefinition.short_name;
-        return path;
+        if(config.useS3) {
+             var path = "https://s3.amazonaws.com/coloredcoin-assets/" + AssetDefinition.short_name;
+             return path;
+        }
+        else
+        {
+            var path = config.machineurl + "/metadata/" + AssetDefinition.short_name;
+            return path;
+        }
     }
 
     function returnIssuedAsset(transaction) {
