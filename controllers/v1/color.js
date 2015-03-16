@@ -176,7 +176,8 @@ module.exports = (function () {
             },
             function (error) {
                 console.log("createAsset failed");
-                res.send({ error: error });
+                console.log(JSON.stringify(error, ['stack', 'message'], 2));
+                res.send({ error: JSON.stringify(error, ['remote'], 1) });
             });
         }).catch(function (error) {
             console.log(error)
@@ -269,7 +270,7 @@ module.exports = (function () {
         /*
         AssetDefinition.issue_adress
         AssetDefinition.name
-        AssetDefinition.sort_name
+        AssetDefinition.short_name
         AssetDefinition.amount
         AssetDefinition.fee
         AssetDefinition.selfhost
@@ -283,27 +284,36 @@ module.exports = (function () {
         */
     }
 
-    function hostMetadataFile(AssetDefinition) {
-        var deferred = Q.defer();
+    function hostMetadataFile(AssetDefinition, hostOnS3) {
 
-        var longurl = generateLocalMetadataPath(AssetDefinition);
-        google.getShortUrl(longurl)
-        .then(function (url) {
-            AssetDefinition.contract_url = url;
-            utils.createMetadata(AssetDefinition);
-            deferred.resolve(url);
-        },
-        function (error) {
-            deferred.reject(new Error("Status code was " + response.statusCode));
-        });
+        if(hostOnS3) {
 
-        AssetDefinition.contract_url;
+        }
+        else
+        {
+            var deferred = Q.defer();
 
-        return deferred.promise;
+            var longurl = generateLocalMetadataPath(AssetDefinition);
+            google.getShortUrl(longurl)
+            .then(function (url) {
+                AssetDefinition.contract_url = url;
+                utils.createMetadata(AssetDefinition);
+                deferred.resolve(url);
+            },
+            function (error) {
+                deferred.reject(new Error("Status code was " + response.statusCode));
+            });
+
+            AssetDefinition.contract_url;
+
+            return deferred.promise;
+        }
+
+      
     }
 
     function generateLocalMetadataPath(AssetDefinition) {
-        var path = config.machineurl + "/metadata/" + AssetDefinition.sort_name;
+        var path = config.machineurl + "/metadata/" + AssetDefinition.short_name;
         return path;
     }
 

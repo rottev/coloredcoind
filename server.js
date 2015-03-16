@@ -53,7 +53,6 @@ controllers.register(app);
 
 
 
-
 var docs_handler = express.static(__dirname + '/node_modules/swagger-node-express/swagger-ui');
 app.get(/^\/docs(\/.*)?$/, function (req, res, next) {
     if (req.url === '/docs') { // express static barfs on root url w/o trailing slash

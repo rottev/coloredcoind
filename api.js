@@ -20,6 +20,7 @@ module.exports = (function () {
     colorapi.getAssetDefeintion = function getAssetDefeintion(asset_address) {
         console.log("getAssetDefeintion: " + asset_address);
         var deferred = Q.defer();
+        
         var args = {
             path: { "asset_address": asset_address }
         };
@@ -132,7 +133,10 @@ module.exports = (function () {
                 deferred.resolve({ transaction: data, asset: asset });
             }
             else {
-                deferred.reject(new Error("Status code was " + response.statusCode));
+                 console.log(new Error("Status code was " + response.statusCode));
+                 var error = new Error("Status code was " + response.statusCode);
+                 error.remote = data;
+                deferred.reject(error);
             }
         }).on('error', function (err) {
             console.log('something went wrong on the request', err.request.options);

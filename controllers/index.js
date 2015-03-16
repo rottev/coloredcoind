@@ -3,6 +3,7 @@ var fs = require('fs');
 var express = require('express');
 var sw = require("swagger-node-express");
 var _ = require('lodash');
+var config = require('../config.js');
 
 
 
@@ -31,7 +32,7 @@ module.exports.register = function (app) {
 
         versions[version].a.register(versionpath, swagger);
         swagger.configureSwaggerPaths("", "/api-docs", "");
-        swagger.configure("http://localhost:8080/" + versions[version].b, "0." + versions[version].b.match( /\d+/g ));
+        swagger.configure( config.machineurl + "/" + versions[version].b, "0." + versions[version].b.match( /\d+/g ));
 
 
      //   console.log("wtf " + versions[version].b);
