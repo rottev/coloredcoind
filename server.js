@@ -6,7 +6,17 @@ var swagger = require("swagger-node-express");
 //var stylus = require('stylus');
 //var nib = require('nib');
 //var api = require('./api');
+var log4js = require('log4js');
+log4js.loadAppender('file');
+log4js.addAppender(log4js.appenders.file('/var/log/nodejs.log'), 'eblog');
+var logger = log4js.getLogger('eblog');
 
+console.log=(function() {
+  var orig=console.log;
+  return function() {
+      logger.debug.apply(logger, Array.prototype.slice.call(arguments));
+  };
+})();  
 
 
 var app = express();

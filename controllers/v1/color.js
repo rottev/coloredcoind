@@ -7,6 +7,14 @@ module.exports = (function () {
     var redis = require('redis');
     var Q = require("q");
     var AWS = require("aws-sdk");
+    var creds = {};
+    try
+    { creds = require("./credentials.js"); }
+    catch(e)
+    { console.log("no credentials file loading from env "); 
+     creds.AWSAKI = process.env.AWSAKI;
+     creds.AWSSSK = process.env.AWSSSK; }
+    
 
 
     function color() { };
