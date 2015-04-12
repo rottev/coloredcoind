@@ -7,9 +7,11 @@ module.exports = (function () {
     var redis = require('redis');
     var Q = require("q");
     var AWS = require("aws-sdk");
+
+
     var creds = {};
     try
-    { creds = require("./credentials.js"); }
+    { creds = require('../../credentials.js'); }
     catch(e)
     { console.log("no credentials file loading from env "); 
      creds.AWSAKI = process.env.AWSAKI;
@@ -307,7 +309,8 @@ module.exports = (function () {
                 google.getShortUrl(longurl)
                 .then(function (url) {
                     AssetDefinition.contract_url = url;
-                    s3bucket.upload({Key: AssetDefinition.short_name, Body:JSON.stringify(AssetDefinition), ContentType: 'application/json' }, function(err, data) {
+                    var metadata = utils.getMetadataFromAsset(AssetDefinition);
+                    s3bucket.upload({Key: AssetDefinition.short_name, Body:JSON.stringify(metadata), ContentType: 'application/json' }, function(err, data) {
                         if (err) {
                           console.log("Error uploading data: ", err);
                             deferred.reject(new Error("Status code was " + err));

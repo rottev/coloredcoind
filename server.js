@@ -10,14 +10,43 @@ var log4js = require('log4js');
 log4js.loadAppender('file');
 log4js.addAppender(log4js.appenders.file('/var/log/nodejs.log'), 'eblog');
 var logger = log4js.getLogger('eblog');
+var logentries = require('le_node');
+
+var log = logentries.logger({
+  token: process.env.LETOKEN
+})
+
 
 console.log=(function() {
   var orig=console.log;
   return function() {
       logger.debug.apply(logger, Array.prototype.slice.call(arguments));
+      if(process.env.LETOKEN)
+      {
+        var args =  Array.prototype.slice.call(arguments);
+        args.unshift('info');
+        log.log.apply(log, args);
+      }
   };
 })();  
 
+console.error=(function() {
+  var orig=console.error;
+  return function() {
+      logger.error.apply(logger, Array.prototype.slice.call(arguments));
+       if(process.env.LETOKEN)
+      {
+        var args =  Array.prototype.slice.call(arguments);
+        args.unshift('err');
+        orig(args);
+        log.log.apply(log, args);
+      }
+  };
+})();  
+
+if(!process.env.LETOKEN) {
+  console.error("No Logentries token found in enviorment");
+}
 
 var app = express();
 
@@ -71,7 +100,6 @@ app.get(/^\/docs(\/.*)?$/, function (req, res, next) {
     }
     // take off leading /docs so that connect locates file correctly
     req.url = req.url.substr('/docs'.length);
-    console.log("barf 2");
     return docs_handler(req, res, next);
 });
 

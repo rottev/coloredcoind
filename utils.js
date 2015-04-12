@@ -65,11 +65,27 @@ module.exports = (function () {
         console.log("createMetadata: " + AssetDefinition.contract_url);
 
         try {
+            var data = utils.getMetadataFromAsset(AssetDefinition);
+            fs.writeFileSync(__dirname + "/static/metadata/" + AssetDefinition.short_name, JSON.stringify(data));
+        }
+        catch (e) {
+            console.log(e);
+        }
+
+
+    }
+
+
+
+    utils.getMetadataFromAsset = function createMetadata(AssetDefinition) {
+        console.log("createMetadata: " + AssetDefinition.contract_url);
+
+        try {
             metadata = {
                 asset_ids: [utils.getAssetId(AssetDefinition.issue_adress)
               ],
                 contract_url: AssetDefinition.contract_url,
-                name_short: AssetDefinition.sort_name,
+                name_short: AssetDefinition.short_name,
                 name: AssetDefinition.name,
                 issuer: AssetDefinition.metadata.issuer,
                 description: AssetDefinition.metadata.description,
@@ -81,27 +97,12 @@ module.exports = (function () {
                 image_url: AssetDefinition.metadata.image_url,
                 version: "1.0"
             };
-            fs.writeFileSync(__dirname + "/static/metadata/" + AssetDefinition.sort_name, JSON.stringify(metadata));
+            return metadata;
         }
         catch (e) {
             console.log(e);
+            return {};
         }
-
-        /*
-        AssetDefinition.issue_adress
-        AssetDefinition.name
-        AssetDefinition.sort_name
-        AssetDefinition.amount
-        AssetDefinition.fee
-        AssetDefinition.selfhost
-        AssetDefinition.metadata.issuer
-        AssetDefinition.metadata.divisibility
-        AssetDefinition.metadata.icon_url
-        AssetDefinition.metadata.image_url
-        AssetDefinition.metadata.version
-        AssetDefinition.metadata.type
-        AssetDefinition.metadat_url
-        */
 
 
     }
