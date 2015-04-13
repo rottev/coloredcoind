@@ -4,22 +4,28 @@ var api = require('./api.js');
 var Client = require('node-rest-client').Client;
 var Q = require('q');
 
+function thedate() {
+   return new Date().toISOString().
+  replace(/T/, ' ').      // replace T with a space
+  replace(/\..+/, '')     // delete the dot and everything after
+}
+
 var args = {
     data: {
       "issue_adress": "mxNTyQ3WdFMQE7SGVpSQGXnSDevGMLq7dg",
-      "name": "test5 coins",
-      "sort_name": "t5c",
-      "amount": "1001",
+      "name": "test coins " + thedate(),
+      "short_name": "testcoins" + new Date().toISOString(),
+      "amount": "1",
       "fee": "1000",
       "selfhost": "false",
       "metadata": {
             "issuer": "me",
-            "divisibility": "4",
+            "divisibility": "1",
             "icon_url": "null",
             "image_url": "null",
             "version": "string",
             "type": "1.0",
-            "description": "yada"
+            "description": "yada " + thedate()
       },
       "metadat_url": ""
 
@@ -49,10 +55,7 @@ var trySignTransactionBitcoinjs = function trySignTransactionBitcoinjs(data) {
     var deferred = Q.defer();
     try {
         dataobj = JSON.parse(data);
-        transactionObj = JSON.parse(dataobj.tx.transaction);
-        console.log("****************************************");
-        console.log(transactionObj.raw);
-        var tx = bitcoinjs.Transaction.fromHex(transactionObj.raw);
+        var tx = bitcoinjs.Transaction.fromHex(dataobj.txHex);
 
         console.log(tx);
         var txorig = tx.clone();

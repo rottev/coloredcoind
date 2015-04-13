@@ -109,7 +109,8 @@ module.exports = (function () {
                 "nickname": "getAsset"
             },
             'action': function (req, res) {
-                res.send(api.getAssetDefeintion(req.params.assetId));
+                api.getAssetDefeintion(req.params.assetId).
+                then(function(data) { res.status(200).send(data) }, function(data) { res.status(400).send(data); });
             }
         };
 
