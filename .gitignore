@@ -1,4 +1,4 @@
 /static
-test.*
+./test.*
 web.config
 test-reports.xml
