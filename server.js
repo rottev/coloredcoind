@@ -3,19 +3,27 @@ var config = require("./config");
 var bodyParser = require('body-parser');
 var controllers = require('./controllers');
 var swagger = require("swagger-node-express");
+var fs = require('fs');
 //var stylus = require('stylus');
 //var nib = require('nib');
 //var api = require('./api');
 var log4js = require('log4js');
-log4js.loadAppender('file');
-log4js.addAppender(log4js.appenders.file('/var/log/nodejs.log'), 'eblog');
-var logger = log4js.getLogger('eblog');
+
+var logger = log4js.getLogger('console');
 var logentries = require('le_node');
 
 var log = logentries.logger({
   token: process.env.LETOKEN
 })
 
+
+// stup file logger if on elastic
+if(fs.existsSync('/var/log/nodejs.log')) {
+  log4js.loadAppender('file');
+  log4js.addAppender(log4js.appenders.file('/var/log/nodejs.log'), 'eblog');
+  logger = log4js.getLogger('eblog');
+
+}
 
 console.log=(function() {
   var orig=console.log;
@@ -24,7 +32,7 @@ console.log=(function() {
       if(process.env.LETOKEN)
       {
         var args =  Array.prototype.slice.call(arguments);
-        args.unshift('info');
+        args.unshift('debug');
         log.log.apply(log, args);
       }
   };
@@ -33,7 +41,7 @@ console.log=(function() {
 console.error=(function() {
   var orig=console.error;
   return function() {
-      logger.error.apply(logger, Array.prototype.slice.call(arguments));
+       logger.error.apply(logger, Array.prototype.slice.call(arguments));
        if(process.env.LETOKEN)
       {
         var args =  Array.prototype.slice.call(arguments);

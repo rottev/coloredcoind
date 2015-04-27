@@ -11,7 +11,7 @@ exports.models = {
                 "type": "integer",
                 "format": "int32",
                 "description": "How divisible is the asset",
-                "minimum": "1",
+                "minimum": "0",
                 "maximum": "20"
             },
             "icon_url": {

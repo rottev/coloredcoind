@@ -23,11 +23,19 @@
   "noAnalyze": true,
   "engines": {
     "node": ">=0.6"
-  },  
-  "devDependencies": {},
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": ">= 0.0.1",
+    "supertest": "^0.15.0"
+  },
   "optionalDependencies": {},
-  "apidoc":{
-    "title":"ColordCoins api documentation",
+  "apidoc": {
+    "title": "ColordCoins api documentation",
     "url": "http://localhost:8080"
+  },
+  "scripts": {
+    "start": "node .\\server.js",
+    "test": "mocha -R xunit > test-reports.xml"
   }
 }
